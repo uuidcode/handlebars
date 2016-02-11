@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Options;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
@@ -119,16 +120,22 @@ public class Main {
 
         result =
             Stream.of(result.split(lineSeparator))
-                .filter(
-                    line -> {
-                        return line.trim().length() > 0;
-                    }
-                ).map(
-                    line -> {
-                        return line.trim();
-                    }
-                ).collect(Collectors.joining(""));
+                .filter(line -> line.trim().length() > 0)
+                .map(String::trim)
+                .collect(Collectors.joining(""));
 
         Assert.assertEquals(expectedResult, result);
+    }
+
+    public static String hello(String parameter, Options options) {
+        return "hello";
+    }
+
+    @Test
+    public void helper() throws Exception {
+        Handlebars handlebars = new Handlebars();
+        handlebars.registerHelpers(Main.class);
+        Template template = handlebars.compileInline("{{#hello \"hi\" \"a\"}}{{/hello}}");
+        Assert.assertEquals("hello", template.apply(null));
     }
 }
