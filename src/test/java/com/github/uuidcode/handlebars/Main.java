@@ -17,6 +17,16 @@ import com.github.jknack.handlebars.io.TemplateLoader;
 public class Main {
     class Data {
         private String title;
+        private Model model;
+
+        public Model getModel() {
+            return this.model;
+        }
+
+        public Data setModel(Model model) {
+            this.model = model;
+            return this;
+        }
 
         public String getTitle() {
             return this.title;
@@ -28,6 +38,18 @@ public class Main {
         }
     }
 
+    class Model {
+        private String name;
+
+        public String getName() {
+            return this.name;
+        }
+
+        public Model setName(String name) {
+            this.name = name;
+            return this;
+        }
+    }
     public Data getData() {
         return new Data().setTitle("Title");
     }
@@ -135,7 +157,11 @@ public class Main {
     public void helper() throws Exception {
         Handlebars handlebars = new Handlebars();
         handlebars.registerHelpers(Main.class);
-        Template template = handlebars.compileInline("{{hello title}}");
-        Assert.assertEquals("hello OK!", template.apply(new Data().setTitle("OK!")));
+        Template template = handlebars.compileInline("{{hello title}} {{title}} {{#model}}<h1>{{name}}</h1>{{/model}}");
+
+        Data data = this.getData();
+        data.setModel(new Model().setName("TEST"));
+
+        Assert.assertEquals("hello Title Title <h1>TEST</h1>", template.apply(data));
     }
 }
