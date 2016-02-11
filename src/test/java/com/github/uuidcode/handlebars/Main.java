@@ -127,15 +127,15 @@ public class Main {
         Assert.assertEquals(expectedResult, result);
     }
 
-    public static String hello(String parameter, Options options) {
-        return "hello";
+    public static String hello(String to) {
+        return "hello " + to;
     }
 
     @Test
     public void helper() throws Exception {
         Handlebars handlebars = new Handlebars();
         handlebars.registerHelpers(Main.class);
-        Template template = handlebars.compileInline("{{#hello \"hi\" \"a\"}}{{/hello}}");
-        Assert.assertEquals("hello", template.apply(null));
+        Template template = handlebars.compileInline("{{hello title}}");
+        Assert.assertEquals("hello OK!", template.apply(new Data().setTitle("OK!")));
     }
 }
