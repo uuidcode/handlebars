@@ -157,7 +157,7 @@ public class Main {
     public void helper() throws Exception {
         Handlebars handlebars = new Handlebars();
         handlebars.registerHelpers(Main.class);
-        Template template = handlebars.compileInline("{{hello title}} {{title}} {{#model}}<h1>{{name}}</h1>{{/model}}");
+        Template template = handlebars.compileInline("{{hello title}} {{title}} {{#with model}}<h1>{{name}}</h1>{{/with}}");
 
         Data data = this.getData();
         data.setModel(new Model().setName("TEST"));
