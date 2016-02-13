@@ -354,9 +354,13 @@ public class Main {
         Handlebars handlebars = new Handlebars();
 
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("data", (new Data().setTitle("a").setModel(new Model())));
-
         Template template = null;
+
+        template = handlebars.compileInline("{{#if data.model.isNew}}OK{{else}}ERROR{{/if}}");
+        Assert.assertEquals("ERROR", template.apply(this.getContext(map)));
+
+        Data data = new Data().setTitle("a").setModel(new Model());
+        map.put("data", data);
 
         template = handlebars.compileInline("{{#if true}}OK{{/if}}");
         Assert.assertEquals("OK", template.apply(this.getContext(map)));
@@ -367,7 +371,39 @@ public class Main {
         template = handlebars.compileInline("{{#if data.model.isNew}}OK{{/if}}");
         Assert.assertEquals("OK", template.apply(this.getContext(map)));
 
+        template = handlebars.compileInline("{{#if data.model.isNew}}OK{{/if}}");
+        Assert.assertEquals("OK", template.apply(this.getContext(map)));
+
         template = handlebars.compileInline("{{#if data.model.isOld}}OK{{else}}ERROR{{/if}}");
         Assert.assertEquals("ERROR", template.apply(this.getContext(map)));
+
+        template = handlebars.compileInline("{{#if data.title}}OK{{else}}ERROR{{/if}}");
+        Assert.assertEquals("OK", template.apply(this.getContext(map)));
+
+        template = handlebars.compileInline("{{#if data.getTitle}}OK{{else}}ERROR{{/if}}");
+        Assert.assertEquals("OK", template.apply(this.getContext(map)));
+
+        data.setTitle("");
+
+        template = handlebars.compileInline("{{#if data.title}}OK{{else}}ERROR{{/if}}");
+        Assert.assertEquals("ERROR", template.apply(this.getContext(map)));
+
+        template = handlebars.compileInline("{{#if data.getTitle}}OK{{else}}ERROR{{/if}}");
+        Assert.assertEquals("ERROR", template.apply(this.getContext(map)));
+
+        data.setTitle(null);
+        template = handlebars.compileInline("{{#if data.title}}OK{{else}}ERROR{{/if}}");
+        Assert.assertEquals("ERROR", template.apply(this.getContext(map)));
+
+        template = handlebars.compileInline("{{#if data.getTitle}}OK{{else}}ERROR{{/if}}");
+        Assert.assertEquals("ERROR", template.apply(this.getContext(map)));
+
+        template = handlebars.compileInline("{{#if data.age}}OK{{else}}ERROR{{/if}}");
+        Assert.assertEquals("ERROR", template.apply(this.getContext(map)));
+
+        data.setAge(1);
+
+        template = handlebars.compileInline("{{#if data.age}}OK{{else}}ERROR{{/if}}");
+        Assert.assertEquals("OK", template.apply(this.getContext(map)));
     }
 }
