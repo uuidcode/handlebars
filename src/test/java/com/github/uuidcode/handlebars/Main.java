@@ -1,6 +1,8 @@
 package com.github.uuidcode.handlebars;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -260,17 +262,7 @@ public class Main {
         map.put("time", "10");
         map.put("model", new Model().setName("Hello"));
 
-        Context context = Context
-            .newBuilder(map)
-            .resolver(
-                MapValueResolver.INSTANCE,
-                JavaBeanValueResolver.INSTANCE,
-                FieldValueResolver.INSTANCE,
-                MethodValueResolver.INSTANCE
-            )
-            .build();
-
-        Assert.assertEquals("hi Hello 10 Title Title TEST TEST isNew isOld", template.apply(context));
+        Assert.assertEquals("hi Hello 10 Title Title TEST TEST isNew isOld", template.apply(getContext(map)));
     }
 
     @Test
@@ -316,7 +308,66 @@ public class Main {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("data", this.getData());
 
+        Context context = getContext(map);
+
         Template template = handlebars.compileInline("Hello {{data.getTitle}}!");
-        Assert.assertEquals("Hello Title!", template.apply(map));
+        Assert.assertEquals("Hello Title!", template.apply(context));
+    }
+
+    private Context getContext(Map<String, Object> map) {
+        return Context
+                .newBuilder(map)
+                .resolver(
+                    MapValueResolver.INSTANCE,
+                    JavaBeanValueResolver.INSTANCE,
+                    FieldValueResolver.INSTANCE,
+                    MethodValueResolver.INSTANCE
+                )
+                .build();
+    }
+
+    @Test
+    public void each() throws Exception {
+        Handlebars handlebars = new Handlebars();
+
+        List<Data> dataList = new ArrayList<Data>();
+        dataList.add(new Data().setTitle("a"));
+        dataList.add(new Data().setTitle("b"));
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("dataList", dataList);
+
+        Template template = null;
+
+        template = handlebars.compileInline("{{#each dataList}}{{title}}{{/each}}");
+        Assert.assertEquals("ab", template.apply(this.getContext(map)));
+
+        template = handlebars.compileInline("{{#each dataList}}{{getTitle}}{{/each}}");
+        Assert.assertEquals("ab", template.apply(this.getContext(map)));
+
+        template = handlebars.compileInline("{{#each dataList}}{{@index}}{{/each}}");
+        Assert.assertEquals("01", template.apply(this.getContext(map)));
+    }
+
+    @Test
+    public void testIf3() throws Exception {
+        Handlebars handlebars = new Handlebars();
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("data", (new Data().setTitle("a").setModel(new Model())));
+
+        Template template = null;
+
+        template = handlebars.compileInline("{{#if true}}OK{{/if}}");
+        Assert.assertEquals("OK", template.apply(this.getContext(map)));
+
+        template = handlebars.compileInline("{{#if false}}OK{{/if}}");
+        Assert.assertEquals("", template.apply(this.getContext(map)));
+
+        template = handlebars.compileInline("{{#if data.model.isNew}}OK{{/if}}");
+        Assert.assertEquals("OK", template.apply(this.getContext(map)));
+
+        template = handlebars.compileInline("{{#if data.model.isOld}}OK{{else}}ERROR{{/if}}");
+        Assert.assertEquals("ERROR", template.apply(this.getContext(map)));
     }
 }
