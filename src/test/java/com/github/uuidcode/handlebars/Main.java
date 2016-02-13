@@ -406,4 +406,37 @@ public class Main {
         template = handlebars.compileInline("{{#if data.age}}OK{{else}}ERROR{{/if}}");
         Assert.assertEquals("OK", template.apply(this.getContext(map)));
     }
+
+    @Test
+    public void at() throws Exception {
+        Handlebars handlebars = new Handlebars();
+
+        List<Data> dataList = new ArrayList<Data>();
+        dataList.add(new Data().setTitle("a"));
+        dataList.add(new Data().setTitle("b"));
+        dataList.add(new Data().setTitle("c"));
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("dataList", dataList);
+
+        Template template = null;
+
+        template = handlebars.compileInline("{{#each dataList}}{{@index}}{{/each}}");
+        Assert.assertEquals("012", template.apply(this.getContext(map)));
+
+        template = handlebars.compileInline("{{#each dataList}}{{@first}}{{/each}}");
+        Assert.assertEquals("first", template.apply(this.getContext(map)));
+
+        template = handlebars.compileInline("{{#each dataList}}{{@last}}{{/each}}");
+        Assert.assertEquals("last", template.apply(this.getContext(map)));
+
+        template = handlebars.compileInline("{{#each dataList}}{{@odd}}{{/each}}");
+        Assert.assertEquals("odd", template.apply(this.getContext(map)));
+
+        template = handlebars.compileInline("{{#each dataList}}{{@even}}{{/each}}");
+        Assert.assertEquals("eveneven", template.apply(this.getContext(map)));
+
+        template = handlebars.compileInline("{{#each dataList}}{{@index_1}}{{/each}}");
+        Assert.assertEquals("123", template.apply(this.getContext(map)));
+    }
 }
