@@ -1,9 +1,6 @@
 package com.github.uuidcode.handlebars;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -438,5 +435,22 @@ public class Main {
 
         template = handlebars.compileInline("{{#each dataList}}{{@index_1}}{{/each}}");
         Assert.assertEquals("123", template.apply(this.getContext(map)));
+    }
+
+    @Test
+    public void helper2() throws Exception {
+        Handlebars handlebars = new Handlebars();
+        handlebars.registerHelpers(Main.class);
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("date", new Date());
+
+        Template template = null;
+        template = handlebars.compileInline("{{getTime date}}");
+        System.out.println(template.apply(this.getContext(map)));
+    }
+
+    public static String getTime(Date date) {
+        return String.valueOf(date.getTime());
     }
 }
